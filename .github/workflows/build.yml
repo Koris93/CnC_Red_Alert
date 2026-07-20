@@ -1,0 +1,32 @@
+name: Build Red Alert
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build Project
+      run: |
+        # 這裡會尋找專案中的方案檔 (.sln) 進行編譯
+        msbuild CnC_Red_Alert.sln /p:Configuration=Release /p:Platform=Win32
+      shell: pwsh
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: RedAlert-Build
+        path: |
+          **/*.exe
+          **/*.dll
