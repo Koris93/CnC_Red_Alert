@@ -819,20 +819,17 @@ bool HouseClass::Can_Build(ObjectTypeClass const * type, HousesType house) const
 #endif
 
 	/*
-	**	The computer can always build everything.
+	**	【修改】如果是人類玩家，我們直接放寬陣營限制與科技限制，讓盟軍與蘇軍科技互通！
 	*/
-	if (!IsHuman && Session.Type == GAME_NORMAL) return(true);
+	if (IsHuman) {
+		// 1. 檢查是否已經展開基地車 (STRUCT_CONST)
+		long flags = ActiveBScan;
+		if (!IsHuman) flags = OldBScan;
 
-	/*
-	**	Special hack to get certain objects to exist for both sides in the game.
-	*/
-	int own = type->Get_Ownable();
-
-	/*
-	**	Check to see if this owner can build the object type specified.
-	*/
-	if (((1L << house) & own) == 0) {
-		return(false);
+		// 如果已經有基地車，直接解鎖雙方所有科技與陣營限制！
+		if (flags & STRUCTF_CONST) {
+			return(true);
+		}
 	}
 
 	/*
